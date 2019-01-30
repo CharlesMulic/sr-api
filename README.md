@@ -14,3 +14,8 @@ You can send back a zip file, or post a github repo with code, up to you.
 Make sure we can run the project once received.
 
 Let me know if you have any questions.
+
+expressjs as web server framework
+mocha/should/sinon/proxyquire for testing (although thinking of moving to jest)
+objectionjs as our orm for most services
+prefer native Promises for flow control in javascript
