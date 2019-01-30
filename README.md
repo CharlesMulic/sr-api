@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/CharlesMulic/sr-api.svg?style=svg)](https://circleci.com/gh/CharlesMulic/sr-api)
+
 Use the NFL schedule feed as your source: https://api.ngs.nfl.com/league/schedule?season=2018&seasonType=REG
 
 Ingest data from the feed into a database of your choice (allow for ingestion of different seasons and season types)
