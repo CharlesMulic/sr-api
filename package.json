@@ -1,0 +1,14 @@
+{
+  "name": "sr-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "run": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "Charlie Mulic",
+  "license": "ISC"
+}
