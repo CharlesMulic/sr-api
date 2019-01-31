@@ -76,10 +76,6 @@ describe("NflScheduleService", () => {
     request.get.restore();
   });
 
-  it("is able to get imported", () => {
-    assert(service);
-  });
-
   it("fetches data for the current year when no args are provided", () => {
     request.get.yields(null, responseObject, JSON.stringify(responseBody));
     return service.getNflScheduleForSeason().then(result => {

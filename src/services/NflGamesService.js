@@ -23,23 +23,6 @@ moment.locale("en-nfl", {
   }
 });
 
-function getWeekNumber(dateString) {
-  // regular season 9/6/2018 (Thursday) - 12/30/2018 (Sunday) 17 weeks
-  const parts = dateString.split("/");
-  const month = Number.parseInt(parts[0]);
-  const year = Number.parseInt(parts[2]);
-  const day = Number.parseInt(parts[1]);
-
-  date = new Date(Date.UTC(year, month, day));
-  let weekNum = Number.parseInt(moment(date).format("w"));
-
-  if (weekNum < 40) {
-    weekNum += 52;
-  }
-  weekNum -= 39;
-  return weekNum;
-}
-
 class NflGamesService {
   getGames(query = {}) {
     return new Promise((resolve, reject) => {
@@ -53,42 +36,50 @@ class NflGamesService {
     });
   }
 
-  getByeWeeksForTeamAbbr(abbr) {
+  getByeWeeksForTeamAbbr(abbr, season) {
     return new Promise((resolve, reject) => {
-      this.getGameDatesForTeamAbbr(abbr).then(games => {
-        const byeWeeks = [];
-        for (let i = 1; i <= 17; i++) {
-          // iterate through the 17 NFL season weeks
-          if (games.filter(g => g.week === i).length == 0) {
-            // find the missing weeks
-            byeWeeks.push(i);
+      this.getGameDatesForTeamAbbr(abbr, season).then(games => {
+        if (games.length === 0) {
+          reject(`No game data for: ${abbr}`);
+        } else {
+          console.log(games);
+          const byeWeeks = [];
+          for (let i = 1; i <= 17; i++) {
+            // iterate through the 17 NFL season weeks
+            const game = games.find(g => g.week === i);
+            if (!game) {
+              byeWeeks.push(i); // find the missing weeks
+            }
           }
+          resolve({
+            team: games[0].abbr,
+            byeWeeks: byeWeeks
+            // TODO could include actual date ranges for the bye week
+          });
         }
-        resolve({
-          team: games[0].abbr,
-          byeWeeks
-        });
       });
     });
   }
 
-  getGameDatesForTeamAbbr(abbr) {
-    const query = { $or: [{ "homeTeam.abbr": abbr }, { "visitorTeam.abbr": abbr }] };
+  getGameDatesForTeamAbbr(abbr, season) {
+    const query = {
+      // regex on season for string match on year, and abbr matching home or away team to get all the team's games
+      $and: [{ gameDate: { $regex: season } }, { $or: [{ "homeTeam.abbr": abbr }, { "visitorTeam.abbr": abbr }] }]
+    };
     return new Promise((resolve, reject) => {
-      // { gameDate: 1, _id: 0 }
       Game.find(query, "gameDate", (err, results) => {
         if (err) {
           reject(err);
+        } else if (!results) {
+          reject(`No results found for: ${abbr}`);
         } else {
-          //   const gameDates = results.map(gameData => gameData.gameDate);
-          //   resolve(gameDates);
           resolve(
             results
               .map(r => {
                 return {
                   abbr,
                   gameDate: r.gameDate,
-                  week: getWeekNumber(r.gameDate)
+                  week: this.getNflSeasonWeekNumber(r.gameDate)
                 };
               })
               .sort((a, b) => {
@@ -100,9 +91,21 @@ class NflGamesService {
     });
   }
 
-  getTeams() {
+  getTeamsAbbrs() {
     return new Promise((resolve, reject) => {
       Game.find().distinct("homeTeam.abbr", (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+
+  getTeams() {
+    return new Promise((resolve, reject) => {
+      Game.find({}, (err, results) => {
         if (err) {
           reject(err);
         } else {
@@ -123,8 +126,9 @@ class NflGamesService {
 
   /**
    * This will copy the game data retrieved from a third party to the application's data store
+   * // TODO this will currently cause duplicates if called multiple times
    */
-  ingestThirdPartyData(season = 2018, type = "REG") {
+  ingestThirdPartyData(season = new Date().getFullYear(), type = "REG") {
     return new Promise((resolve, reject) => {
       scheduleService.getNflScheduleForSeason({ season, type }).then(results => {
         for (let i = 0; i < results.response.length; i++) {
@@ -132,17 +136,31 @@ class NflGamesService {
           const game = new Game(gameData);
           game.save((err, g) => {
             if (err) {
-              console.log(err);
-              reject(err);
-              return;
+              return reject(err);
             } else {
-              console.log("Game saved.");
             }
           });
         }
+        console.log(`${results.response.length} Games saved.`);
         resolve();
       });
     });
+  }
+
+  /**
+   * Returns the week of the NFL season between 1 and 17.
+   * @param dateString A date in the format of MM/DD/YYYY
+   */
+  getNflSeasonWeekNumber(dateString) {
+    // regular season 9/6/2018 (Thursday) - 12/30/2018 (Sunday) 17 weeks
+    const date = moment(new Date(dateString));
+    if (!moment(date).isValid()) {
+      throw new Error(`Unexpected date value: ${dateString}. Use the format: M/D/YYYY`);
+    }
+    let weekNum = Number.parseInt(moment(date).format("w"));
+    weekNum -= 35; // offset week number to get weeks 1-17 corresponding to NFL season
+
+    return weekNum;
   }
 }
 
