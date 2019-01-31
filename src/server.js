@@ -4,11 +4,15 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const gamesService = require("./services/NflGamesService");
 const config = require("../conf.js");
+const router = express.Router();
+const teamsRoute = require("./routes/teams")(gamesService);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-require("./routes/teams")(app);
+router.get("/teams/bye", teamsRoute.getByeWeeks);
+router.get("/pointsAfterByeWeek/:teamAlias", teamsRoute.pointsAfterByeWeek);
+app.use("/api", router);
 
 const db = mongoose.connection;
 
@@ -50,3 +54,5 @@ mongoose.connect(
   config.MONGODB_URI,
   { useNewUrlParser: true }
 );
+
+module.exports = app;

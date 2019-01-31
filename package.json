@@ -20,6 +20,7 @@
     "@types/request": "^2.48.1",
     "@types/sinon": "^7.0.5",
     "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.9",
     "sinon": "^7.2.3"

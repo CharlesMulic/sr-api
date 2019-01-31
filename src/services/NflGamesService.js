@@ -40,19 +40,21 @@ class NflGamesService {
     return new Promise((resolve, reject) => {
       this.getGameDatesForTeamAbbr(abbr, season).then(games => {
         if (games.length === 0) {
-          reject(`No game data for: ${abbr}`);
+          resolve({
+            team: abbr,
+            byeWeeks: [0]
+          });
         } else {
-          console.log(games);
           const byeWeeks = [];
           for (let i = 1; i <= 17; i++) {
-            // iterate through the 17 NFL season weeks
+            // iterate through the 17 NFL regular season weeks
             const game = games.find(g => g.week === i);
             if (!game) {
               byeWeeks.push(i); // find the missing weeks
             }
           }
           resolve({
-            team: games[0].abbr,
+            team: abbr,
             byeWeeks: byeWeeks
             // TODO could include actual date ranges for the bye week
           });
@@ -69,9 +71,10 @@ class NflGamesService {
     return new Promise((resolve, reject) => {
       Game.find(query, "gameDate", (err, results) => {
         if (err) {
+          console.log(err);
           reject(err);
-        } else if (!results) {
-          reject(`No results found for: ${abbr}`);
+          // } else if (!results) {
+          //   reject(`No results found for: ${abbr}`);
         } else {
           resolve(
             results

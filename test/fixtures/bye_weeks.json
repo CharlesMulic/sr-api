@@ -1,0 +1,47 @@
+{
+  "res": {
+    "success": {
+      "statusCode": 200,
+      "headers": {
+        "content-type": "application/json"
+      }
+    }
+  },
+  "allByeWeeks": {
+    "body": {
+      "season": 2018,
+      "teams": [
+        {
+          "team": "WAS",
+          "byeWeeks": [4]
+        },
+        {
+          "team": "CAR",
+          "byeWeeks": [4]
+        }
+      ]
+    }
+  },
+  "byeWeeksByAbbr": {
+    "body": {
+      "season": 2018,
+      "teams": [
+        {
+          "team": "WAS",
+          "byeWeeks": [4]
+        }
+      ]
+    }
+  },
+  "byeWeeksByAbbrAndSeason": {
+    "body": {
+      "season": "2017",
+      "teams": [
+        {
+          "team": "WAS",
+          "byeWeeks": [5]
+        }
+      ]
+    }
+  }
+}
