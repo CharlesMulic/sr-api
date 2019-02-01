@@ -19,6 +19,7 @@
     "@types/mongoose": "^5.3.11",
     "@types/request": "^2.48.1",
     "@types/sinon": "^7.0.5",
+    "@types/winston": "^2.4.4",
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
     "mocha": "^5.2.0",
@@ -29,6 +30,7 @@
     "express": "^4.16.4",
     "moment": "^2.24.0",
     "mongoose": "^5.4.8",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "winston": "^3.2.1"
   }
 }

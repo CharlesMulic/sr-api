@@ -1,14 +1,21 @@
+const log = require("./util/Logger");
+const config = require("../conf.js")(log);
+
 const express = require("express");
+const router = express.Router();
 const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const gamesService = require("./services/NflGamesService");
-const config = require("../conf.js");
-const router = express.Router();
+
+const gamesService = require("./services/NflGamesService")(log);
 const teamsRoute = require("./routes/teams")(gamesService);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+  log.info(`Received request to: ${req.url}`);
+  next();
+});
 
 router.get("/teams/bye", teamsRoute.getByeWeeks);
 router.get("/pointsAfterByeWeek/:teamAlias", teamsRoute.pointsAfterByeWeek);
@@ -17,12 +24,13 @@ app.use("/api", router);
 const db = mongoose.connection;
 
 db.on("error", err => {
-  console.log(err);
+  log.error(err);
 });
 
 db.once("open", () => {
+  log.info("Successfully connected to database");
   app.listen(config.PORT);
-  console.log(`Server started on port: ${config.PORT}`);
+  log.info(`Server started on port: ${config.PORT}`);
 
   //   gamesService.getGameDatesForTeamAbbr("PHI").then(games => {
   //     console.log(games);
@@ -50,6 +58,7 @@ db.once("open", () => {
   //     .catch(err => console.log(err));
 });
 
+log.info("Attempting to connect to database...");
 mongoose.connect(
   config.MONGODB_URI,
   { useNewUrlParser: true }

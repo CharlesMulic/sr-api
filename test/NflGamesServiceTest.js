@@ -2,7 +2,8 @@ const chai = require("chai");
 const expect = chai.expect;
 const assert = chai.assert;
 const sinon = require("sinon");
-const service = require("../src/services/NflGamesService");
+const log = require("../src/util/Logger");
+const service = require("../src/services/NflGamesService")(log);
 const request = require("request");
 
 describe("NflGamesService", () => {

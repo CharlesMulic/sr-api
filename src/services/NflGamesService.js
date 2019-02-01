@@ -24,6 +24,10 @@ moment.locale("en-nfl", {
 });
 
 class NflGamesService {
+  constructor(logger) {
+    this.log = logger;
+  }
+
   getGames(query = {}) {
     return new Promise((resolve, reject) => {
       Game.find(query, (err, gameData) => {
@@ -71,7 +75,7 @@ class NflGamesService {
     return new Promise((resolve, reject) => {
       Game.find(query, "gameDate", (err, results) => {
         if (err) {
-          console.log(err);
+          this.logger.warn(err);
           reject(err);
           // } else if (!results) {
           //   reject(`No results found for: ${abbr}`);
@@ -120,9 +124,9 @@ class NflGamesService {
 
   clearData() {
     mongoose.connection.collections["games"].drop(err => {
-      console.log("Collection dropped: games");
+      this.logger.info("Collection dropped: games");
       if (err) {
-        console.log(err);
+        this.logger.error(err);
       }
     });
   }
@@ -144,7 +148,7 @@ class NflGamesService {
             }
           });
         }
-        console.log(`${results.response.length} Games saved.`);
+        this.logger.info(`${results.response.length} Games saved.`);
         resolve();
       });
     });
@@ -167,6 +171,10 @@ class NflGamesService {
   }
 }
 
-const service = new NflGamesService();
+// const service = new NflGamesService();
 
-module.exports = service;
+// module.exports = service;
+module.exports = logger => {
+  const service = new NflGamesService(logger);
+  return service;
+};

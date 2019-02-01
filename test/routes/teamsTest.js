@@ -72,10 +72,6 @@ describe("teams", () => {
     // it("something when unknown abbr", () => {
     //   req.query.abbr = "FAIL";
     //   return teams.getByeWeeks(req, res).then(() => {
-    //     console.log(result);
-    //     expect(result.teams).is.a("array");
-    //     expect(result.teams.length).to.equal(1);
-    //     expect(result.teams[0].team).to.equal("CAR");
     //   });
     // });
   });
