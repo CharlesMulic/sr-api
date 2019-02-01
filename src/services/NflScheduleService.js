@@ -5,6 +5,10 @@ const baseUrl = "https://api.ngs.nfl.com/league/schedule"; // ?season=2018&seaso
 const seasonTypes = ["PRE", "REG", "POST"];
 
 class NflScheduleService {
+  constructor(logger) {
+    this.log = logger;
+  }
+
   /**
    * Fetches game information from the https://api.ngs.nfl.com/league/schedule endpoint and returns JSON.
    * With no parameters, it will return games of all types for last year's season.
@@ -20,11 +24,11 @@ class NflScheduleService {
     if (seasonTypes.includes(params.type)) {
       endpoint += `&seasonType=${params.type}`;
     } else if (params.type) {
-      console.log(`Ignoring unknown season type: ${params.type}`);
+      this.log.warn(`Ignoring unknown season type: ${params.type}`);
     }
 
     return new Promise((resolve, reject) => {
-      console.log(`Making request to: ${endpoint}`);
+      this.log.info(`Making request to: ${endpoint}`);
       request.get(endpoint, function(err, res, body) {
         if (!err) {
           resolve({
@@ -39,6 +43,7 @@ class NflScheduleService {
   }
 }
 
-const service = new NflScheduleService();
-
-module.exports = service;
+module.exports = logger => {
+  const service = new NflScheduleService(logger);
+  return service;
+};

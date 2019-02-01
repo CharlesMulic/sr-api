@@ -12,7 +12,6 @@ corresponding teams and bye weeks. A bye week for the NFL is a week that team do
 AFTER the bye week (optionally by period, so include a period parameter as well).
 */
 
-const scheduleService = require("./NflScheduleService");
 const Game = require("../models/Game");
 const mongoose = require("mongoose");
 const moment = require("moment");
@@ -24,7 +23,8 @@ moment.locale("en-nfl", {
 });
 
 class NflGamesService {
-  constructor(logger) {
+  constructor(scheduleService, logger) {
+    this.scheduleService = scheduleService;
     this.log = logger;
   }
 
@@ -174,7 +174,7 @@ class NflGamesService {
 // const service = new NflGamesService();
 
 // module.exports = service;
-module.exports = logger => {
-  const service = new NflGamesService(logger);
+module.exports = (scheduleService, logger) => {
+  const service = new NflGamesService(scheduleService, logger);
   return service;
 };

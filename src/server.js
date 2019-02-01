@@ -7,7 +7,8 @@ const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-const gamesService = require("./services/NflGamesService")(log);
+const scheduleService = require("./services/NflScheduleService")(log);
+const gamesService = require("./services/NflGamesService")(scheduleService, log);
 const teamsRoute = require("./routes/teams")(gamesService);
 
 app.use(bodyParser.urlencoded({ extended: true }));
